@@ -47,12 +47,18 @@ static void emit_gamepad_event(gamepad::GamepadInfo* gamepad,
     g_autoptr(FlValue) map = fl_value_new_map();
     fl_value_set_string(map, "gamepadId",
                         fl_value_new_string(gamepad->device_id.c_str()));
+    // TODO
+    fl_value_set_string(map, "gamepadName",
+                            fl_value_new_string(gamepad->name.c_str()));
     fl_value_set_string(map, "time", fl_value_new_int(event.time));
     fl_value_set_string(map, "type",
                         fl_value_new_string(parse_event_type(event).c_str()));
     fl_value_set_string(
         map, "key", fl_value_new_string(std::to_string(event.number).c_str()));
     fl_value_set_string(map, "value", fl_value_new_float(event.value));
+    // TODO
+    fl_value_set_string(map, "label",
+                        fl_value_new_string(std::to_string(event.number).c_str()));
     fl_method_channel_invoke_method(channel, "onGamepadEvent", map, nullptr,
                                     nullptr, nullptr);
   }

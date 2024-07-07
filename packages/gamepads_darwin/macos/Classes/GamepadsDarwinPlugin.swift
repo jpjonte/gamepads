@@ -29,19 +29,21 @@ public class GamepadsDarwinPlugin: NSObject, FlutterPlugin {
     }
 
     private func onGamepadEvent(gamepadId: Int, gamepad: GCExtendedGamepad, element: GCControllerElement) {
-        for (key, value) in getValues(element: element) {
+        for (key, label, value) in getValues(element: element) {
             let arguments: [String: Any] = [
                 "gamepadId": String(gamepadId),
+                "gamepadName": gamepad.controller?.vendorName ?? "Unknown gamepad",
                 "time": Int(getTimestamp(gamepad: gamepad)),
                 "type": element.isAnalog ? "analog" : "button",
                 "key": key,
                 "value": value,
+                "label": label ?? key,
             ]
             channel.invokeMethod("onGamepadEvent", arguments: arguments)
         }
     }
 
-    private func getValues(element: GCControllerElement) -> [(String, Float)] {
+    private func getValues(element: GCControllerElement) -> [(String, String?, Float)] {
         if let element = element as? GCControllerButtonInput {
             var button: String = "Unknown button"
             if #available(macOS 11.0, *) {
@@ -50,7 +52,7 @@ public class GamepadsDarwinPlugin: NSObject, FlutterPlugin {
                 }
             }
             
-            return [(button, element.value)]
+            return [(button,  getLabelForElement(element: element), element.value)]
         } else if let element = element as? GCControllerAxisInput {
             var axis: String = "Unknown axis"
             if #available(macOS 11.0, *) {
@@ -58,18 +60,13 @@ public class GamepadsDarwinPlugin: NSObject, FlutterPlugin {
                     axis = element.sfSymbolsName!
                 }
             }
-            return [(axis, element.value)]
+            return [(axis, getLabelForElement(element: element), element.value)]
         } else if let element = element as? GCControllerDirectionPad {
-            var directionPad: String = "Unknown direction pad"
-    
-            if #available(macOS 11.0, *) {
-                if (element.sfSymbolsName != nil) {
-                    directionPad = element.sfSymbolsName!
-                }
-            }
             return [
-                (maybeConcat(directionPad, "xAxis"), element.xAxis.value),
-                (maybeConcat(directionPad, "yAxis"), element.yAxis.value)
+                (getNameForElement(element: element.up) ?? "Unknown direction pad", getLabelForElement(element: element.up), element.up.value),
+                (getNameForElement(element: element.right) ?? "Unknown direction pad", getLabelForElement(element: element.right), element.right.value),
+                (getNameForElement(element: element.down) ?? "Unknown direction pad", getLabelForElement(element: element.down), element.down.value),
+                (getNameForElement(element: element.left) ?? "Unknown direction pad", getLabelForElement(element: element.left), element.left.value),
             ]
         } else {
             return []
@@ -79,6 +76,14 @@ public class GamepadsDarwinPlugin: NSObject, FlutterPlugin {
     private func getNameForElement(element: GCControllerElement) -> String? {
         if #available(macOS 11.0, *) {
             return element.sfSymbolsName
+        } else {
+            return nil
+        }
+    }
+
+    private func getLabelForElement(element: GCControllerElement) -> String? {
+        if #available(macOS 11.0, *) {
+            return element.localizedName
         } else {
             return nil
         }
@@ -116,7 +121,7 @@ public class GamepadsDarwinPlugin: NSObject, FlutterPlugin {
         if (nonNull.isEmpty) {
             return nil
         }
-        return nonNull.joined(separator: " - ")
+        return nonNull.joined(separator: "_")
     }
 }
 

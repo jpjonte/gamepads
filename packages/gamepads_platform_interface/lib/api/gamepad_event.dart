@@ -23,6 +23,9 @@ class GamepadEvent {
   /// The id of the gamepad controller that fired the event.
   final String gamepadId;
 
+  /// The name of the gamepad controller that fired the event.
+  final String gamepadName;
+
   /// The timestamp in which the event was fired, in milliseconds since epoch.
   final int timestamp;
 
@@ -35,12 +38,17 @@ class GamepadEvent {
   /// The current value of the key.
   final double value;
 
+  /// A human-readable label for the key that was triggered.
+  final String label;
+
   GamepadEvent({
     required this.gamepadId,
+    required this.gamepadName,
     required this.timestamp,
     required this.type,
     required this.key,
     required this.value,
+    required this.label,
   });
 
   @override
@@ -50,17 +58,21 @@ class GamepadEvent {
 
   factory GamepadEvent.parse(Map<dynamic, dynamic> map) {
     final gamepadId = map['gamepadId'] as String;
+    final gamepadName = map['gamepadName'] as String;
     final timestamp = map['time'] as int;
     final type = KeyType.values.byName(map['type'] as String);
     final key = map['key'] as String;
     final value = map['value'] as double;
+    final label = map['label'] as String;
 
     return GamepadEvent(
       gamepadId: gamepadId,
+      gamepadName: gamepadName,
       timestamp: timestamp,
       type: type,
       key: key,
       value: value,
+      label: label,
     );
   }
 }
