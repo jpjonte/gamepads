@@ -41,6 +41,18 @@ static std::string parse_event_type(js_event event) {
   }
 }
 
+static float parse_event_value(js_event event) {
+  if (event.type & JS_EVENT_INIT) {
+    return 0;
+  }
+
+  if (event.type & JS_EVENT_BUTTON) {
+    return event.value;
+  }
+
+  return (float)event.value / 32767;
+}
+
 static void emit_gamepad_event(gamepad::GamepadInfo* gamepad,
                                const js_event& event) {
   if (channel) {
@@ -55,7 +67,7 @@ static void emit_gamepad_event(gamepad::GamepadInfo* gamepad,
                         fl_value_new_string(parse_event_type(event).c_str()));
     fl_value_set_string(
         map, "key", fl_value_new_string(std::to_string(event.number).c_str()));
-    fl_value_set_string(map, "value", fl_value_new_float(event.value));
+    fl_value_set_string(map, "value", fl_value_new_float(parse_event_value(event)));
     // TODO
     fl_value_set_string(map, "label",
                         fl_value_new_string(std::to_string(event.number).c_str()));
