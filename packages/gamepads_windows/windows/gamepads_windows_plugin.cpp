@@ -1,8 +1,9 @@
 #include "gamepads_windows_plugin.h"
 
-#include <dbt.h>
-#include <hidclass.h>
 #include <windows.h>
+#include <initguid.h>
+#include <hidclass.h>
+#include <dbt.h>
 
 #include <flutter/encodable_value.h>
 #include <flutter/method_channel.h>
