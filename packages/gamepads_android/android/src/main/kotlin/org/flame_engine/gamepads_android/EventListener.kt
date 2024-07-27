@@ -30,10 +30,12 @@ class EventListener {
     fun onKeyEvent(keyEvent: KeyEvent, channel: MethodChannel): Boolean {
         val arguments = mapOf(
             "gamepadId" to keyEvent.getDeviceId().toString(),
+            "gamepadName" to InputDevice.getDevice(keyEvent.getDeviceId())?.getName(),
             "time" to keyEvent.getEventTime(),
             "type" to "button",
             "key" to KeyEvent.keyCodeToString(keyEvent.getKeyCode()),
             "value" to keyEvent.getAction().toDouble()
+            "label" to keyEvent.getDisplayLabel().toString()
         )
         channel.invokeMethod("onGamepadEvent", arguments)
         return true
@@ -62,10 +64,12 @@ class EventListener {
 
         val arguments = mapOf(
             "gamepadId" to motionEvent.getDeviceId().toString(),
+            "gamepadName" to InputDevice.getDevice(motionEvent.getDeviceId())?.getName(),
             "time" to motionEvent.getEventTime(),
             "type" to "analog",
             "key" to MotionEvent.axisToString(axis),
             "value" to value,
+            "label" to "Axis ${MotionEvent.axisToString(axis)}"
         )
         channel.invokeMethod("onGamepadEvent", arguments)
         return true
